@@ -2,15 +2,17 @@ package com.LockedMe;
 
 import java.io.IOException;
 import java.nio.file.*;
+import java.sql.SQLOutput;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Scanner;
 class FileManager {
     /**This method receives a path  and delete the file from the directory
-     * before deleting the file it asks user to reconfirm delete operation
-     * it returns 1 if delete successfully and returns -1 if not.
-     *
+     * before deleting the file it check if file exists or not
+     * after deleting the file it checks availability of file and prints successful message if it doesn't exists
+     *anymore and prints unsuccessful message if it still exists.
+     * It throws IOException.
      * @param dir
      * @return
      */
@@ -39,6 +41,11 @@ class FileManager {
             }
         }
         scanner.close();
+        if ( Files.notExists(filePath)){
+            System.out.println("Successfully Deleted");
+        }else {
+            System.out.println("Not Deleted");
+        }
     }
 
     /**This method receives a path and a file name and search the file from the directory and prints relevant message.
@@ -76,7 +83,10 @@ class FileManager {
 
 
     /**This method receives a path and a file name and Add the file to the directory
-     * it returns 1 if find the file and returns -1 if not.
+     * Before creating the file, it checks if the file already exits or not. If the file already exists it
+     * print a message otherwise adds the files to the directory. At the end it checks availability of added file.
+     * If it finds file in directory, it prints successful message otherwise prints unsuccessful message.
+     * It throws IOException.
      * @param dir
      * @return
      */
@@ -103,6 +113,11 @@ class FileManager {
             }
         }
         scanner.close();
+        if (Files.exists(filePath)){
+            System.out.println("Successfully Added !");
+        } else {
+            System.out.println("Not Added");
+        }
 
     }
 
@@ -144,51 +159,57 @@ public class Main {
 
         final String applicationName = "LockedMe.com";
         final String developerName = "Ali Samiei";
-        String userOption;
+        String userOption=null;
         String pathDirectory=null;
         String fileName=null;
         String directory ="/Users/Pedram/Documents/Cloud-Programming/Course-Simplilearn" +
-                "/ASSESSMENT1/TestFiles"; // directory in which files are located
+                "/ASSESSMENT1/TestFiles/"; // directory in which files are located
         String file=null;
 
         welcomeScreen(applicationName,developerName);
+        mainMenu();
+        Scanner scanner = new Scanner((System.in));
+        while(scanner.hasNextLine()){
+            userOption=scanner.nextLine();
+
+            switch(userOption){
+                case "1" : {List<Path> list =new ArrayList<Path>();
+                    list=FileManager.listingDirectory(directory);
+                    FileManager.sortFile(list); }
+
+                    break;
+
+                case "2" : subMenu();
+
+                     break;
+
+                case "A" : FileManager.addFile(directory);
+
+                    break;
+
+                case "D" : FileManager.deleteFile(directory);
+
+                    break;
+
+                case "S" : FileManager.searchFile(directory);
+
+                    break;
+
+                case "R" : mainMenu();
+
+                    break;
+
+                case "3"  : System.exit(0);
 
 
-        // Here we check the option selected by user and calls related method
-        // Delete , Add, Sort or Search
+                default:
+                    System.out.println("Press a valid key");
 
-        Scanner scanner = new Scanner(System.in);
-        userOption=scanner.nextLine();
-
-        switch (userOption) {
-            case "B":{  // print directory before and after sorting
-                List<Path> list =new ArrayList<Path>();
-                list=FileManager.listingDirectory(directory);
-                FileManager.sortFile(list);
             }
-            break ;
-            case "A":
-                FileManager.addFile(directory);
 
-                break;
-            case "D":
-                FileManager.deleteFile(directory);
-
-                break;
-            case "S":
-                FileManager.searchFile(directory);
-
-                break;
-            case "R":
-                System.out.println("we are in Return");
-
-                break;
-            case "E":
-                System.exit(0);
-
-                break;
         }
         scanner.close();
+
     }
 
     /**
@@ -198,12 +219,33 @@ public class Main {
     static void welcomeScreen(String appName, String devName) {
         System.out.println("****************************************************************");
         System.out.println("****************************************************************");
-        System.out.println("       ************ WELCOME TO LockedMe.com ***********");
+        System.out.println("                   WELCOME TO LockedMe.com                      ");
         System.out.println("                 Application name :" + appName);
         System.out.println("                  Developer name :" + devName);
         System.out.println("****************************************************************");
         System.out.println("****************************************************************");
 
+
+    }
+
+    /**
+     * this method prints main options , reads user input and returns pressed key as integer
+     * Option1 : Sorting
+     * Option2: Sub_Menu
+     * Option3: Exit
+     */
+    static void mainMenu(){
+        System.out.println("");
+        System.out.println("Press 1 , 2 or 3 :");
+        System.out.println("Option 1 : Sorting Directory    "+"Option 2 : Sub_Menu     "+   "Option 3 : Exit" );
+
+    }
+
+    /** This method prints sub_menu
+     * read input key and returns pressed key
+     */
+    static void subMenu(){
+        String userKey=null;
         System.out.println("Press (B) to Sort file names in ascending order :");
         System.out.println("Press (A) to Add a file to the existing directory list :");
         System.out.println("Press (D) to Delete a specified file :");
@@ -212,5 +254,6 @@ public class Main {
         System.out.println("Press (E) to exit :");
 
     }
+
     }
 
